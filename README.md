@@ -1,70 +1,161 @@
-# Getting Started with Create React App
+To integrate popoto with the react, you have to follow these steps
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+1)	Install following packages using the commands 
 
-In the project directory, you can run:
+Npm install popoto
+Npm install d3
 
-### `yarn start`
+2)	Open index.html file in your react application (public/index.html)
+3)	Add these code in head tag
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+<!-- Add default CSS reference -->
+<link rel="stylesheet" href="https://unpkg.com/popoto/dist/popoto.min.css">
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+<!-- Add Popoto script reference, will default to popoto.min.js -->
+<script src="https://unpkg.com/popoto"></script>
 
-### `yarn test`
+<!-- Add Popoto script reference -->
+<script src="https://unpkg.com/popoto/dist/popoto.js"></script>
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `yarn build`
+4)	The project directory will look like this 
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+src=>components=>Popoto.js
+src=>components=>Popoto.css
+src=>App.js
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+ 
+5)	Paste the following code inside Popoto.js file
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+import './Popoto.css';
+import * as d3 from 'd3';
+import * as popoto from 'popoto';
+import React, { Component } from 'react';
+import * as neo4j from 'neo4j-driver'
 
-### `yarn eject`
+class Popoto extends Component {
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+    constructor(props) {
+        super(props);
+        this.popotoConfig = this.popotoConfig.bind(this);
+        this.testVarible= '<section class="ppt-section-main"><div class="ppt-container-graph"><nav id="popoto-taxonomy" class="ppt-taxo-nav"></nav><div id="popoto-graph" class="ppt-div-graph"></div></div><div id="popoto-query" class="ppt-container-query"></div><div id="popoto-cypher" class="ppt-container-cypher"></div><div class="ppt-section-header">RESULTS <span id="result-total-count" class="ppt-count"></span></div><div id="popoto-results" class="ppt-container-results"></div></section>';
+    }
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+    componentDidMount() {
+        this.popotoConfig();
+    }
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+    popotoConfig() {
+     
+        const driver = neo4j.driver('bolt://44.192.97.5:7687',
+                  neo4j.auth.basic('neo4j', 'pronoun-finger-words'), 
+                  {/* encrypted: 'ENCRYPTION_OFF' */});
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+                   /**
+     * Set the driver to Popoto's query runner
+     */
+    popoto.runner.DRIVER = driver
 
-## Learn More
+    popoto.provider.node.Provider = {
+        "Person": {
+            "returnAttributes": ["name", "born"],
+            "constraintAttribute": "name",
+            "autoExpandRelations": true // if set to true Person nodes will be automatically expanded in graph
+        },
+        "Movie": {
+            "returnAttributes": ["title", "released", "tagline"],
+            "constraintAttribute": "title"
+        }
+    };
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+    popoto.result.onTotalResultCount(function (count) {
+        document.getElementById("result-total-count").innerHTML = "(" + count + ")";
+    });
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+    popoto.query.RESULTS_PAGE_SIZE = 100;
+    popoto.logger.LEVEL = popoto.logger.LogLevels.INFO;
+    
 
-### Code Splitting
+    driver.verifyConnectivity().then(function () {
+        popoto.start("Person");
+    }).catch(function (error) {
+        // Handle error...
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+        console.log('error a gya : ' + error)
+    })
 
-### Analyzing the Bundle Size
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+                
+    }
 
-### Making a Progressive Web App
+    
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+    render() {
 
-### Advanced Configuration
+        return (
+            <div class="ppt-body" dangerouslySetInnerHTML={{__html: this.testVarible}}>
+        
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+            </div>
+        )
+    }
+}
 
-### Deployment
+export default Popoto;
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-### `yarn build` fails to minify
+6)	Copy this code to popoto.css file
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+/* INIT POPOTO CLASSES */
+
+#popoto-graph:fullscreen {
+  width: 100%;
+  height: 100%;
+}
+#popoto-graph:-webkit-full-screen {
+  width: 100%;
+  height: 100%;
+}
+#popoto-graph:-moz-full-screen {
+  width: 100%;
+  height: 100%;
+}
+#popoto-graph:-ms-fullscreen {
+  width: 100%;
+  height: 100%;
+}
+.ppt-div-graph {
+  height: 50%;
+}
+
+.ppt-section-header {
+  margin-top: 0 !important;
+}
+
+.ppt-section-main {
+  height: 500px;
+}
+
+/* END POPOTO CLASSES */
+
+
+7)	Now copy this to your app.js file 
+
+
+import React, { Component } from 'react';
+import Popoto from './components/Popoto';
+
+class App extends Component {
+
+  render() {
+    return (
+      <Popoto />
+    );
+  }
+}
+
+export default App;
+
+
+8) Now run your project & Popoto will be working  
