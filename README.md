@@ -4,18 +4,20 @@ To integrate popoto with the react, you have to follow these steps
 1)	Install following packages using the commands 
 
 Npm install popoto
+
+
 Npm install d3
 
 2)	Open index.html file in your react application (public/index.html)
 3)	Add these code in head tag
 
-<!-- Add default CSS reference -->
+
 <link rel="stylesheet" href="https://unpkg.com/popoto/dist/popoto.min.css">
 
-<!-- Add Popoto script reference, will default to popoto.min.js -->
+
 <script src="https://unpkg.com/popoto"></script>
 
-<!-- Add Popoto script reference -->
+
 <script src="https://unpkg.com/popoto/dist/popoto.js"></script>
 
 
@@ -100,9 +102,7 @@ class Popoto extends Component {
             </div>
         )
     }
-}
-
-export default Popoto;
+}  export default Popoto;
 
 
 6)	Copy this code to popoto.css file
