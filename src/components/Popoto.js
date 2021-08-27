@@ -54,7 +54,7 @@ class Popoto extends Component {
     }).catch(function (error) {
         // Handle error...
 
-        console.log('error a gya : ' + error)
+        console.log('error  : ' + error)
     })
 
 
